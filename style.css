@@ -1,0 +1,109 @@
+body {
+  font-family: Verdana, sans-serif;
+  text-align: center;
+  width: 594mm;
+  height: 841mm;
+  border: 1px solid black;
+  padding: 2cm;
+}
+
+#id {
+  width: 10cm;
+  height: 10cm;
+  font-size: 100pt;
+  background-color: rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 2cm;
+}
+
+#header {
+  display: flex;
+  border-bottom: 2px solid black;
+}
+
+#header_text {
+  padding-top: 1.5cm;
+  flex: 1;
+  font-size: 40pt;
+}
+#header_text h1 {
+  margin-top: 0;
+  font-size: 48pt;
+  text-transform: uppercase;
+}
+
+table {
+  margin: 1em auto 0.2em auto;
+  font-size: 22pt;
+}
+
+.table-caption {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+.text-block {
+  padding: 0.4cm 0;
+  text-align: justify;
+  font-size: 23pt;
+}
+.text-block h2 {
+  text-transform: uppercase;
+  margin: 0 0 0.4em 0;
+  font-size: 1.3em;
+}
+.text-block h3 {
+  margin: 0;
+}
+.text-block p {
+  margin: 0.4em 0;
+}
+
+table {
+  border-collapse: collapse;
+}
+table caption {
+  text-align: center;
+  caption-side: bottom;
+}
+table td, table th {
+  border: 1px solid black;
+  padding: 0.2em 0.4em;
+}
+
+#main {
+  height: 70%;
+}
+
+#footer {
+  height: 8%;
+}
+
+.columns {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+.columns .column {
+  box-sizing: border-box;
+  width: 50%;
+  height: 100%;
+}
+.columns .column:first-child {
+  padding-right: 2em;
+}
+.columns .column:last-child {
+  padding-left: 2em;
+}
+
+#szn-logo {
+  width: 70%;
+}
+
+.center {
+  text-align: center;
+}
+
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css?v=1.0">
+    <title>Poster 2019</title>
+</head>
+
+<body>
+<div id="header">
+    <div id="id">IC14</div>
+    <div id="header_text">
+        <h1>CNN based near-duplicate image detection<br>
+            used for email spam detection</h1>
+        <div id="name">Vít Listík (listivit@fel.cvut.cz)</div>
+    </div>
+</div>
+
+<div class="text-block">
+    <h2>Abstract</h2>
+    <p>
+        Near-duplicate image detection is&nbsp;used for searching similar
+        images but may also be&nbsp;used for&nbsp;spam detection. Near-duplicate
+        images
+        may&nbsp;be blacklisted as&nbsp;image spam or&nbsp;number
+        of&nbsp;occurrences
+        of&nbsp;the&nbsp;nearly same
+        image may&nbsp;be calculated. We&nbsp;propose using features extracted
+        from the&nbsp;convolutional neural network for the detection task. We
+        also propose how to&nbsp;convert the&nbsp;vector to&nbsp;a&nbsp;much
+        smaller hash and we compare those
+        methods to&nbsp;previously used methods. We&nbsp;did test our&nbsp;solution
+        for&nbsp;1000
+        publicly available images. We&nbsp;did 5&nbsp;alternations on&nbsp;each
+        image
+        from the
+        dataset (blur, noise, crop, rotate, brightness). Then&nbsp;we&nbsp;tested
+        all&nbsp;the&nbsp;algorithms for&nbsp;searching if the&nbsp;original
+        image is&nbsp;the&nbsp;closest
+        one&nbsp;to&nbsp;the&nbsp;altered images. Our&nbsp;proposed solution
+        performed significantly
+        better for&nbsp;this&nbsp;task. Other algorithms were having a&nbsp;lot&nbsp;of&nbsp;false
+        positives for&nbsp;cropped and rotated images.
+    </p>
+</div>
+<div class="columns" id="main">
+    <div class="column">
+        <div class="text-block">
+            <h2>Keywords</h2>
+            <p>
+                Image, Near-duplicate detection, Spam, ResNet, Convolutional
+                Neural
+                Network (CNN)
+            </p>
+        </div>
+        <div class="text-block">
+            <h2>Task</h2>
+            <p>
+                Cluster images extracted from email traffic stream.
+                Clustering should be supine to slight alternations, which are
+                used by spammers.
+            </p>
+        </div>
+        <div class="text-block">
+            <h2>Methods</h2>
+            <p>
+                Because the task requires clustering to unknown number of
+                clusters we are searching for image hash representation which
+                will define a cluster.<br>
+                We are using ImageHash library as a baseline. This library
+                offers first 4 hashes in the following list.
+            </p>
+            <ul>
+                <li><b>Average hashing</b> - Reducing high frequencies.
+                    Bilinear downscale (8x8), then convert to grayscale and
+                    compute average intensity. Compute bits based on threshold
+                    (more or less then average).
+                </li>
+                <li><b>Perceptual hash</b> - Based on discrete cosine
+                    transform. Reduce high frequencies. Compute average
+                    value and do the thresholding.
+                </li>
+                <li><b>Difference hash</b> - Based on gradient direction
+                    (difference of adjacent pixels). Bits are computed
+                    based on the brightness of the neighbour.
+                </li>
+                <li><b>Wavelet hash</b> - Based on Haar wavelet which is
+                    using Fourier analysis.
+                </li>
+                <li><b>CNN hash</b> - Our proposed hash method. We are using
+                    ResNet
+                    for feature vector (hash) extraction. We are using vector of
+                    length 2048 extracted from the fully-connected layer after
+                    the
+                    convolution.
+                </li>
+            </ul>
+            <p>
+                CNN hash vector is originally 2048 float numbers, which makes
+                the hash space too big for our use case. We propose using
+                binarization inspired by Average hashing. We used fixed
+                threshold 0.5 and average threshold. We used method similar
+                to max pooling with window size 2, 4, 8, 16, 32 and 64 and
+                looked if 1 is present (max reduction) and if average is
+                above 0.5 (average reduction)
+            </p>
+            <p>
+                We did several alternations on each image to simulate
+                alternations done by spammers.
+            <ul>
+                <li><b>Blur</b> - Gaussian blur of the image pixels with radius
+                    2
+                </li>
+                <li><b>Crop</b> - Random crop of the image not smaller then 40%
+                    of the
+                    original
+                </li>
+                <li><b>Brightness</b> - Making the image lighter or darker up to
+                    80%
+                </li>
+                <li><b>Rotate</b> - Image rotation up to 30 deg</li>
+                <li><b>Noise</b> - Adding Gaussian noise to the image</li>
+            </ul>
+            <p>
+                Distance metrics used for measuring the closest image.
+            </p>
+            <ul>
+                <li><b>Hamming</b> - This
+                    metric computes the number of changes needed for inputs of
+                    the same length to make them equal. This metric is used in
+                    ImageHash library for comparison of the bits.
+                </li>
+                <li><b>Cosine</b> - Used for real-valued high dimensional
+                    vectors such as our proposed CNN based hash. This metric
+                    ignores the magnitude of the vectors.
+                </li>
+            </ul>
+            <p>
+                Python implementation may be found at
+                https://github.com/tivvit/image-duplicate-detection-eval
+            </p>
+        </div>
+    </div>
+    <div class="column">
+        <div class="text-block">
+            <h2>Experimental results</h2>
+            <h3>Dataset</h3>
+            <p>
+                We used 1000 first images from OpenImages
+                database.
+            </p>
+
+
+            <h3>Similarity detection</h3>
+            <p>
+                We did test if the alternations of the image are the closest
+                ones to the original image. The images were sorted based on the
+                distance metric and if the alternation was found after some
+                other images the score was lowered proportionally to the number
+                of false positive images (0-1) shown in Tab. 1 and individual
+                alternations in Tab. 2.
+            </p>
+            <table>
+                <tr>
+                    <th>Method</th>
+                    <th>CNN</th>
+                    <th>Average hash</th>
+                    <th>pHash</th>
+                    <th>pHash</th>
+                    <th>wHash</th>
+                </tr>
+                <tr>
+                    <td>Score</td>
+                    <td>0.98</td>
+                    <td>0.10</td>
+                    <td>0.04</td>
+                    <td>0.03</td>
+                    <td>0.09</td>
+                </tr>
+            </table>
+            <div class="table-caption">Tab. 1 - Score in range 0-1 for
+                searching image
+                alternations
+            </div>
+
+            <table>
+                <thead>
+                <tr>
+                    <th>Method</th>
+                    <th
+                    >Blur
+                    </th>
+                    <th>Crop</th>
+                    <th>Bright</th>
+                    <th>Rotate</th>
+                    <th>Noise</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>CNN</td>
+                    <td>2.39</td>
+                    <td>4.44</td>
+                    <td>1.65</td>
+                    <td>2.97</td>
+                    <td>4.03</td>
+                </tr>
+                <tr>
+                    <td>Avg hash</td>
+                    <td>1.05</td>
+                    <td>802.00</td>
+                    <td>2.68</td>
+                    <td>350.36</td>
+                    <td>1.63</td>
+                </tr>
+                <tr>
+                    <td>dHash</td>
+                    <td>1.20</td>
+                    <td>1843.44</td>
+                    <td>3.00</td>
+                    <td>559.65</td>
+                    <td>3.52</td>
+                </tr>
+                <tr>
+                    <td>pHash</td>
+                    <td>1.11</td>
+                    <td>1761.22</td>
+                    <td>2.39</td>
+                    <td>756.63</td>
+                    <td>1.69</td>
+                </tr>
+                <tr>
+                    <td>wHash</td>
+                    <td>1.07</td>
+                    <td>755.39</td>
+                    <td>1.87</td>
+                    <td>310.55</td>
+                    <td>1.39</td>
+                </tr>
+                </tbody>
+            </table>
+            <div class="table-caption">Tab. 2 - Average positions of the
+                alternations
+                for the individual hashing methods.
+            </div>
+
+            <h3>Hash representation</h3>
+            <p>
+                We compared hash representations of the
+                altered and original images and expected exact matches. The
+                results may be seen in Tab. 3, for more detailed
+                results please see our paper.
+            </p>
+            <table>
+                <tr>
+                    <th>Method</th>
+                    <th>dHash</th>
+                    <th>pHash</th>
+                    <th>average hash</th>
+                    <th>wHash</th>
+                </tr>
+                <tr>
+                    <td>Match</td>
+                    <td>33.2%</td>
+                    <td>42.5%</td>
+                    <td>44.5%</td>
+                    <td>50.7%</td>
+                </tr>
+            </table>
+            <table>
+                <tr>
+                    <th>Method</th>
+                    <th>ab8</th>
+                    <th>ab16</th>
+                    <th>mba16</th>
+                    <th>aba32</th>
+                    <th>mba32</th>
+                    <th>mba64</th>
+                </tr>
+                <tr>
+                    <td>Match</td>
+                    <td>0.4%</td>
+                    <td>2.5%</td>
+                    <td>5.9%</td>
+                    <td>7.0%</td>
+                    <td>13.0%</td>
+                    <td>13.1%</td>
+                </tr>
+            </table>
+            <div class="table-caption">Results for number of exactly matching
+                hashes.
+                Where
+                ab8 means average reduced windows of size 8 for threshold
+                binarization (*ba - average binarization, m* - max
+                reduction).
+            </div>
+
+            <h3>Conclusion</h3>
+            <p>
+                We show the performance of near duplicate image detection
+                algorithms on 1000 images. Each of the images was altered with 5
+                operations (blur, noise, crop, rotate, brightness). We did
+                search the closest images to the original image and shown that
+                proposed CNN solution with score 0.98 (max 1) is significantly
+                better for that task then simpler similarity detection
+                algorithms which scored best 0.1. The feature vector extracted
+                from CNN was performing almost the same for all alternations.
+                Other hashing algorithms were affected by rotation and mostly by
+                crop. We did also test the exact match of the computed hash from
+                the altered image to the hash computed from the original image.
+                Our simple method for binarization and reduction the feature
+                vector achieved up to 13% match while hashing algorithms
+                achieved up to 50%. We propose using exact match for
+                blacklisting or a tree structure with image representations
+                which may be used for creating image buckets for counting
+                occurrences.
+            </p>
+        </div>
+    </div>
+</div>
+<div class="columns" id="footer">
+    <div class="column">
+        <div class="text-block">
+            <h2>Acknowledgements</h2>
+            <p>
+                The research described in the paper was supervised by Prof.
+                V.
+                Hlaváč
+                and J. Šedivý CSc. CIIRC in Prague and supported by the
+                Seznam.cz
+                company.
+            </p>
+        </div>
+    </div>
+    <div class="column">
+        <div class="text-block">
+            <p class="center">
+                <img id="szn-logo" src="img/seznam_logo.svg">
+            </p>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
